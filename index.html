@@ -3,7 +3,7 @@
   <head>
     <title>Flores Amarillas 🌼 | Para Ti</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
     <style>
@@ -21,37 +21,31 @@
       
       #msg {
         position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
+        bottom: 30px;
         width: 100%;
-        padding: 20px 10px;
         text-align: center;
-        font-size: 1.6em;
+        font-size: 1.8em;
         color: #FFD700;
         font-family: 'Georgia', serif;
-        text-shadow: 3px 3px 10px rgba(0,0,0,0.8);
-        z-index: 100;
+        text-shadow: 3px 3px 10px rgba(0,0,0,0.7);
+        z-index: 10;
         animation: pulse 2s ease-in-out infinite;
         letter-spacing: 2px;
+        /* Evita que el texto sea seleccionable accidentalmente en el móvil */
         user-select: none;
         -webkit-user-select: none;
       }
-
-      @media (max-width: 768px) and (orientation: portrait) {
-        #msg {
-          font-size: 1.3em;
-          padding: 25px 10px;
-        }
-      }
-
-      @media (max-width: 900px) and (orientation: landscape) {
-        #msg {
-          font-size: 1.1em;
-          padding: 15px 10px;
-        }
-      }
       
+      /* [NUEVO] ESTILOS RESPONSIVOS PARA CELULARES */
+      @media (max-width: 768px) {
+        #msg {
+          /* Usamos vmin para que el tamaño se base en la dimensión más pequeña de la pantalla */
+          font-size: 6vmin;
+          bottom: 20px; /* Lo acercamos un poco más al borde */
+          text-shadow: 2px 2px 8px rgba(0,0,0,0.7); /* Sombra más sutil */
+        }
+      }
+
       @keyframes pulse {
         0%, 100% { transform: scale(1); }
         50% { transform: scale(1.05); }
@@ -64,12 +58,39 @@
         color: #FFD700;
         animation: fall linear infinite;
         filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
-        z-index: 99;
+        z-index: 5;
       }
       
       @keyframes fall {
         to {
           transform: translateY(110vh) rotate(360deg);
+        }
+      }
+      
+      .petal {
+        position: fixed;
+        width: 15px;
+        height: 20px;
+        background: linear-gradient(45deg, #FFD700, #FFA500);
+        border-radius: 0 50% 50% 50%;
+        animation: petalFall linear infinite;
+        opacity: 0.8;
+      }
+      
+      @keyframes petalFall {
+        0% {
+          transform: translateY(-20px) rotate(0deg);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.8;
+        }
+        90% {
+          opacity: 0.8;
+        }
+        100% {
+          transform: translateY(110vh) rotate(720deg);
+          opacity: 0;
         }
       }
       
@@ -81,52 +102,95 @@
         color: white;
         font-family: Arial, sans-serif;
         font-size: 1.2em;
-        z-index: 101;
+        z-index: 100;
         text-align: center;
       }
       
+      .heart {
+        position: fixed;
+        color: #FFD700; /* Corazón amarillo */
+        font-size: 20px;
+        animation: floatHeart 8s infinite ease-in-out;
+        opacity: 0.6;
+      }
+      
+      @keyframes floatHeart {
+        0%, 100% { 
+          transform: translateY(0) translateX(0) scale(1); 
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.6;
+        }
+        50% { 
+          transform: translateY(-50vh) translateX(30px) scale(1.2); 
+          opacity: 0.8;
+        }
+        90% {
+          opacity: 0.6;
+        }
+      }
     </style>
   </head>
   <body>
     <div id="msg">💛 Este ramo es para ti 🌻</div>
     <div class="loading" id="loading">
-      🌼 Cargando tu ramo especial... 🌼
+      🌼 Preparando tu ramo especial... 🌼
     </div>
 
     <script>
       window.addEventListener('load', () => {
         setTimeout(() => {
-          const loadingScreen = document.getElementById('loading');
-          if (loadingScreen) {
-            loadingScreen.style.display = 'none';
-          }
-        }, 3000);
+          document.getElementById('loading').style.display = 'none';
+        }, 2000);
       });
 
-      function createFallingObject() {
-        const items = ['🌼', '🌻', '💛', '✨']; 
-        const item = document.createElement("div");
-        item.classList.add("flower");
-        item.innerHTML = items[Math.floor(Math.random() * items.length)];
-        item.style.left = Math.random() * 100 + "vw";
-        item.style.animationDuration = (5 + Math.random() * 7) + "s";
-        item.style.fontSize = (15 + Math.random() * 20) + "px";
-        item.style.opacity = 0.5 + Math.random() * 0.5;
-        document.body.appendChild(item);
+      function createFlower() {
+        const flowers = ['🌼', '🌻', '💛']; 
+        const flower = document.createElement("div");
+        flower.classList.add("flower");
+        flower.innerHTML = flowers[Math.floor(Math.random() * flowers.length)];
+        flower.style.left = Math.random() * 100 + "vw";
+        flower.style.animationDuration = (4 + Math.random() * 6) + "s";
+        flower.style.fontSize = (20 + Math.random() * 20) + "px";
+        document.body.appendChild(flower);
 
-        setTimeout(() => {
-          item.remove();
-        }, 12000);
+        setTimeout(() => flower.remove(), 10000);
       }
       
-      setInterval(createFallingObject, 500);
+      function createPetal() {
+        const petal = document.createElement("div");
+        petal.classList.add("petal");
+        petal.style.left = Math.random() * 100 + "vw";
+        petal.style.animationDuration = (5 + Math.random() * 5) + "s";
+        petal.style.animationDelay = Math.random() * 2 + "s";
+        document.body.appendChild(petal);
+
+        setTimeout(() => petal.remove(), 12000);
+      }
+      
+      function createHeart() {
+        const heart = document.createElement("div");
+        heart.classList.add("heart");
+        heart.innerHTML = "💛"; // Corazón amarillo
+        heart.style.left = (10 + Math.random() * 80) + "vw";
+        heart.style.bottom = "10px";
+        heart.style.animationDelay = Math.random() * 3 + "s";
+        document.body.appendChild(heart);
+
+        setTimeout(() => heart.remove(), 8000);
+      }
+      
+      setInterval(createFlower, 600);
+      setInterval(createPetal, 800);
+      setInterval(createHeart, 3000);
       
       const messages = [
         "💛 Este ramo es para ti 🌻",
         "🌼 Flores amarillas como el sol 🌞",
         "💐 Siempre floreces donde estás",
-        "🌻 Tu sonrisa ilumina todo 💛",
-        "✨ Un detalle con mucho cariño ✨"
+        "🌻 Tu sonrisa ilumina como estas flores 💛",
+        "🌼 Un jardín de alegrías para ti"
       ];
       
       let msgIndex = 0;
@@ -136,6 +200,107 @@
       }, 4000);
     </script>
 
+    <script>
+      AFRAME.registerComponent('sway', {
+        schema: {
+          speed: {default: 1},
+          amplitude: {default: 5}
+        },
+        tick: function (time) {
+          const el = this.el;
+          const speed = this.data.speed;
+          const amplitude = this.data.amplitude;
+          el.object3D.rotation.z = Math.sin(time * 0.001 * speed) * amplitude * Math.PI / 180;
+          el.object3D.rotation.x = Math.sin(time * 0.001 * speed * 0.7) * amplitude * 0.5 * Math.PI / 180;
+        }
+      });
+      
+      AFRAME.registerComponent('float', {
+        schema: {
+          speed: {default: 1},
+          amplitude: {default: 0.1}
+        },
+        tick: function (time) {
+          const el = this.el;
+          const speed = this.data.speed;
+          const amplitude = this.data.amplitude;
+          el.object3D.position.y = Math.sin(time * 0.001 * speed) * amplitude;
+        }
+      });
+      
+      AFRAME.registerComponent('sunflower', {
+        schema: {
+          petalColor: {type: 'color', default: '#FFD700'},
+          centerColor: {type: 'color', default: '#8B4513'},
+          stemColor: {type: 'color', default: '#2E8B57'},
+          petalCount: {type: 'int', default: 12},
+          petalHeight: {type: 'number', default: 0.4},
+          petalRadiusBottom: {type: 'number', default: 0.1},
+          centerRadius: {type: 'number', default: 0.15},
+          stemHeight: {type: 'number', default: 1.0},
+          stemRadius: {type: 'number', default: 0.02},
+          swaySpeed: {type: 'number', default: 1.2},
+          swayAmplitude: {type: 'number', default: 4},
+          floatSpeed: {type: 'number', default: 0.8},
+          floatAmplitude: {type: 'number', default: 0.03},
+          offsetRotation: {type: 'vec3', default: {x: 0, y: 0, z: 0}},
+          offsetPosition: {type: 'vec3', default: {x: 0, y: 0, z: 0}},
+          scale: {type: 'number', default: 1}
+        },
+        init: function() {
+          const data = this.data;
+          const el = this.el;
+
+          el.setAttribute('scale', `${data.scale} ${data.scale} ${data.scale}`);
+
+          // Stem
+          const stem = document.createElement('a-entity');
+          stem.setAttribute('geometry', `primitive: cylinder; radius: ${data.stemRadius}; height: ${data.stemHeight}`);
+          stem.setAttribute('material', `color: ${data.stemColor}; roughness: 0.9`);
+          stem.setAttribute('position', `0 ${-data.stemHeight / 2} 0`);
+          el.appendChild(stem);
+
+          // Flower Head
+          const flowerHead = document.createElement('a-entity');
+          flowerHead.setAttribute('float', `speed: ${data.floatSpeed}; amplitude: ${data.floatAmplitude}`);
+          flowerHead.setAttribute('position', '0 0 0'); 
+          
+          // Center
+          const center = document.createElement('a-entity');
+          center.setAttribute('geometry', `primitive: sphere; radius: ${data.centerRadius}`);
+          center.setAttribute('material', `color: ${data.centerColor}; roughness: 0.7`);
+          center.setAttribute('position', '0 0 0');
+          flowerHead.appendChild(center);
+
+          // Petals
+          const petalGroup = document.createElement('a-entity');
+          petalGroup.setAttribute('rotation', '25 0 0'); 
+          flowerHead.appendChild(petalGroup);
+
+          for (let i = 0; i < data.petalCount; i++) {
+            const angle = (360 / data.petalCount) * i;
+            const petalEntity = document.createElement('a-entity');
+            petalEntity.setAttribute('geometry', `primitive: cone; height: ${data.petalHeight}; radius-bottom: ${data.petalRadiusBottom}`);
+            petalEntity.setAttribute('material', `color: ${i % 2 === 0 ? data.petalColor : '#FFEA00'}; side: double; roughness: 0.8`);
+            petalEntity.setAttribute('position', `0 ${data.petalHeight * 0.4} 0`);
+            petalEntity.setAttribute('rotation', `-90 0 0`); 
+            petalEntity.setAttribute('scale', '1 1 0.2'); 
+            petalEntity.setAttribute('sway', `speed: ${data.swaySpeed + Math.random() * 0.5}; amplitude: ${data.swayAmplitude + Math.random() * 2}`);
+            
+            const rotationWrapper = document.createElement('a-entity');
+            rotationWrapper.setAttribute('rotation', `0 0 ${angle}`);
+            rotationWrapper.appendChild( petalEntity);
+            petalGroup.appendChild(rotationWrapper);
+          }
+
+          el.appendChild(flowerHead);
+          
+          el.setAttribute('position', `${data.offsetPosition.x} ${data.offsetPosition.y} ${data.offsetPosition.z}`);
+          el.setAttribute('rotation', `${data.offsetRotation.x} ${data.offsetRotation.y} ${data.offsetRotation.z}`);
+        }
+      });
+    </script>
+
     <a-scene 
       embedded 
       arjs="debugUIEnabled: false; sourceType: webcam;"
@@ -143,60 +308,148 @@
       renderer="logarithmicDepthBuffer: true; colorManagement: true;">
       
       <a-assets>
-        <a-asset-item id="sunflower-model" src="https://cdn.glitch.global/c3f4a9b4-3d71-41e9-9069-b5420e6b0147/sunflower_bouquet.glb?v=1708890539130"></a-asset-item>
       </a-assets>
-
-      <a-light type="ambient" color="#BBB"></a-light>
-      <a-light type="directional" color="white" intensity="0.8" position="-1 2 1"></a-light>
+      <a-light type="ambient" color="#AAA"></a-light>
+      <a-light type="directional" color="#FFF" intensity="0.7" position="-1 2 1"></a-light>
+      <a-light type="directional" color="#FFF" intensity="0.5" position="1 -1 0.5"></a-light>
       
       <a-marker preset="hiro">
-        
-        <a-entity 
-          id="bouquet"
-          gltf-model="#sunflower-model"
-          position="0.5 0 -0.5" 
-          rotation="0 25 0" 
-          scale="0.04 0.04 0.04">
-          
+        <a-entity id="bouquet-container" position="0.8 0.2 -0.5" rotation="0 30 0" scale="1.5 1.5 1.5"> 
           <a-animation
             attribute="rotation"
-            to="0 385 0"
-            dur="30000"
+            to="0 390 0"
+            dur="25000"
             repeat="indefinite"
             easing="linear">
           </a-animation>
+
+          <a-entity sunflower="
+            petalColor: #FFD700; 
+            centerColor: #8B4513; 
+            stemColor: #2E8B57; 
+            petalCount: 16; 
+            petalHeight: 0.6; 
+            petalRadiusBottom: 0.15; 
+            centerRadius: 0.2; 
+            stemHeight: 1.2; 
+            stemRadius: 0.03;
+            swaySpeed: 1.2;
+            swayAmplitude: 5;
+            floatSpeed: 0.9;
+            floatAmplitude: 0.04;
+            offsetPosition: 0 0.6 0;
+            offsetRotation: 0 0 0;
+            scale: 1"> </a-entity>
+
+          <a-entity sunflower="
+            petalColor: #FFEA00; 
+            centerColor: #A0522D; 
+            stemColor: #3CB371; 
+            petalCount: 12; 
+            petalHeight: 0.5; 
+            petalRadiusBottom: 0.1; 
+            centerRadius: 0.12; 
+            stemHeight: 1.0; 
+            stemRadius: 0.025;
+            swaySpeed: 1.5;
+            swayAmplitude: 6;
+            floatSpeed: 1.1;
+            floatAmplitude: 0.05;
+            offsetPosition: -0.4 0.4 -0.2;
+            offsetRotation: 0 0 -15;
+            scale: 0.8"> 
+          </a-entity>
+
+          <a-entity sunflower="
+            petalColor: #FFD700; 
+            centerColor: #A0522D; 
+            stemColor: #3CB371; 
+            petalCount: 14; 
+            petalHeight: 0.55; 
+            petalRadiusBottom: 0.12; 
+            centerRadius: 0.13; 
+            stemHeight: 1.1; 
+            stemRadius: 0.028;
+            swaySpeed: 1.3;
+            swayAmplitude: 7;
+            floatSpeed: 1.0;
+            floatAmplitude: 0.04;
+            offsetPosition: 0.4 0.5 0.1;
+            offsetRotation: 0 0 10;
+            scale: 0.9"> 
+          </a-entity>
+
+          <a-entity sunflower="
+            petalColor: #FFEA00; 
+            centerColor: #CD853F; 
+            stemColor: #6B8E23; 
+            petalCount: 10; 
+            petalHeight: 0.4; 
+            petalRadiusBottom: 0.08; 
+            centerRadius: 0.1; 
+            stemHeight: 0.8; 
+            stemRadius: 0.02;
+            swaySpeed: 1.7;
+            swayAmplitude: 4;
+            floatSpeed: 1.2;
+            floatAmplitude: 0.03;
+            offsetPosition: 0 0.3 0.3;
+            offsetRotation: 0 0 5;
+            scale: 0.7"> 
+          </a-entity>
           
-          <a-animation
-            attribute="position"
-            to="0.5 0.1 -0.5"
-            direction="alternate"
-            dur="4000"
-            repeat="indefinite"
-            easing="easeInOutSine">
-          </a-animation>
+          <a-entity
+            geometry="primitive: cone; height: 0.4; radius-bottom: 0.15"
+            material="color: #228B22; side: double; roughness: 0.9"
+            position="-0.3 -0.1 0.1"
+            rotation="-100 0 -60"
+            scale="1 1 0.18"
+            sway="speed: 0.8; amplitude: 3">
+          </a-entity>
+          <a-entity
+            geometry="primitive: cone; height: 0.4; radius-bottom: 0.15"
+            material="color: #228B22; side: double; roughness: 0.9"
+            position="0.3 -0.1 0.1"
+            rotation="-100 0 60"
+            scale="1 1 0.18"
+            sway="speed: 0.8; amplitude: 3">
+          </a-entity>
+          <a-entity
+            geometry="primitive: cone; height: 0.3; radius-bottom: 0.12"
+            material="color: #3CB371; side: double; roughness: 0.9"
+            position="0 -0.2 -0.2"
+            rotation="-110 0 0"
+            scale="1 1 0.15"
+            sway="speed: 0.9; amplitude: 2">
+          </a-entity>
+
         </a-entity>
         
         <a-text
-          value=""
+          value="Para Ti"
           color="#FFD700"
-          position="0 1.5 0" 
+          position="0 2.2 0" 
           align="center"
-          width="5"
-          font="kelsonsans">
-            <a-animation
-              attribute="position"
-              to="0 1.6 0"
-              direction="alternate"
-              dur="2000"
-              repeat="indefinite"
-              easing="easeInOutSine">
-            </a-animation>
+          width="4"
+          font="kelsonsans"
+          animation="property: position; to: 0 2.4 0; dir: alternate; dur: 2000; loop: true; easing: easeInOutSine">
         </a-text>
-
+        
+        <a-entity
+          geometry="primitive: sphere; radius: 0.02"
+          material="shader: flat; color: #FFFACD;"
+          position="0.3 0.8 0.2"
+          animation="property: position; to: -0.3 0.2 -0.2; dir: alternate; dur: 3000; loop: true">
+        </a-entity>
+        <a-entity
+          geometry="primitive: sphere; radius: 0.02"
+          material="shader: flat; color: #FFFACD;"
+          position="-0.3 0.6 -0.2"
+          animation="property: position; to: 0.3 0.9 0.2; dir: alternate; dur: 3500; loop: true">
+        </a-entity>
       </a-marker>
 
       <a-entity camera></a-entity>
     </a-scene>
   </body>
 </html>
-
