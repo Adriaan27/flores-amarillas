@@ -21,35 +21,34 @@
       
       #msg {
         position: absolute;
-        bottom: 0; /* Lo anclamos a la parte inferior */
+        bottom: 0;
         left: 0;
         right: 0;
         width: 100%;
-        padding: 20px 10px; /* [CAMBIO] Añadimos padding para que no quede pegado al borde */
+        padding: 20px 10px;
         text-align: center;
-        font-size: 1.6em; /* Tamaño base para pantallas grandes */
+        font-size: 1.6em;
         color: #FFD700;
         font-family: 'Georgia', serif;
         text-shadow: 3px 3px 10px rgba(0,0,0,0.8);
-        z-index: 100; /* Aumentamos el z-index por si acaso */
+        z-index: 100;
         animation: pulse 2s ease-in-out infinite;
         letter-spacing: 2px;
         user-select: none;
         -webkit-user-select: none;
       }
 
-      /* [CAMBIO] Media Query más específica y robusta para celulares */
       @media (max-width: 768px) and (orientation: portrait) {
         #msg {
-          font-size: 1.3em; /* Un tamaño legible pero no gigante */
-          padding: 25px 10px; /* Más espacio desde abajo en modo vertical */
+          font-size: 1.3em;
+          padding: 25px 10px;
         }
       }
 
       @media (max-width: 900px) and (orientation: landscape) {
         #msg {
           font-size: 1.1em;
-          padding: 15px 10px; /* Menos espacio en modo horizontal */
+          padding: 15px 10px;
         }
       }
       
@@ -95,24 +94,22 @@
     </div>
 
     <script>
-      // Ocultar mensaje de carga
       window.addEventListener('load', () => {
         setTimeout(() => {
           const loadingScreen = document.getElementById('loading');
           if (loadingScreen) {
             loadingScreen.style.display = 'none';
           }
-        }, 3000); // Aumentamos el tiempo por si el modelo 3D tarda en cargar
+        }, 3000);
       });
 
-      // Función para crear la lluvia de flores
       function createFallingObject() {
         const items = ['🌼', '🌻', '💛', '✨']; 
         const item = document.createElement("div");
         item.classList.add("flower");
         item.innerHTML = items[Math.floor(Math.random() * items.length)];
         item.style.left = Math.random() * 100 + "vw";
-        item.style.animationDuration = (5 + Math.random() * 7) + "s"; // Más lento y variado
+        item.style.animationDuration = (5 + Math.random() * 7) + "s";
         item.style.fontSize = (15 + Math.random() * 20) + "px";
         item.style.opacity = 0.5 + Math.random() * 0.5;
         document.body.appendChild(item);
@@ -122,9 +119,8 @@
         }, 12000);
       }
       
-      setInterval(createFallingObject, 500); // Aumentamos la frecuencia
+      setInterval(createFallingObject, 500);
       
-      // Mensajes rotativos
       const messages = [
         "💛 Este ramo es para ti 🌻",
         "🌼 Flores amarillas como el sol 🌞",
@@ -142,7 +138,7 @@
 
     <a-scene 
       embedded 
-      arjs="debugUIEnabled: false; sourceType: webcam; trackingMethod: best; motionTrackingEnabled: true;"
+      arjs="debugUIEnabled: false; sourceType: webcam;"
       vr-mode-ui="enabled: false"
       renderer="logarithmicDepthBuffer: true; colorManagement: true;">
       
@@ -181,7 +177,7 @@
         </a-entity>
         
         <a-text
-          value=""
+          value="Para Ti"
           color="#FFD700"
           position="0 1.5 0" 
           align="center"
