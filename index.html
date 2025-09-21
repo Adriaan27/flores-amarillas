@@ -81,9 +81,21 @@
         }
       }
       
+      .loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-family: Arial, sans-serif;
+        font-size: 1.2em;
+        z-index: 100;
+        text-align: center;
+      }
+      
       .heart {
         position: fixed;
-        color: #ff69b4;
+        color: #FFD700; /* Corazón amarillo */
         font-size: 20px;
         animation: floatHeart 8s infinite ease-in-out;
         opacity: 0.6;
@@ -105,242 +117,23 @@
           opacity: 0.6;
         }
       }
-      
-      /* Panel de control */
-      .control-panel {
-        position: absolute;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(255, 255, 255, 0.9);
-        padding: 15px;
-        border-radius: 15px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-        z-index: 100;
-        text-align: center;
-        max-width: 90%;
-      }
-      
-      .control-panel h3 {
-        color: #764ba2;
-        margin-bottom: 10px;
-        font-size: 1.2em;
-      }
-      
-      .btn {
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        margin: 5px;
-        border-radius: 25px;
-        cursor: pointer;
-        font-size: 1em;
-        transition: all 0.3s;
-      }
-      
-      .btn:hover {
-        transform: scale(1.05);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-      }
-      
-      .btn.active {
-        background: #FFD700;
-        color: #333;
-      }
-      
-      /* Modal para el marcador */
-      .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.8);
-        z-index: 200;
-        justify-content: center;
-        align-items: center;
-      }
-      
-      .modal-content {
-        background: white;
-        padding: 20px;
-        border-radius: 15px;
-        text-align: center;
-        max-width: 400px;
-        margin: 20px;
-      }
-      
-      .modal img {
-        width: 100%;
-        max-width: 300px;
-        margin: 15px 0;
-        border: 2px solid #764ba2;
-        border-radius: 10px;
-      }
-      
-      .close-modal {
-        background: #ff4444;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 25px;
-        cursor: pointer;
-        margin-top: 10px;
-      }
-      
-      /* Vista 3D sin AR */
-      #view3d {
-        display: none;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 80%;
-        max-width: 500px;
-        height: 60vh;
-        z-index: 50;
-      }
-      
-      .ar-status {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: rgba(255,255,255,0.9);
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-size: 0.9em;
-        z-index: 90;
-      }
-      
-      .ar-status.scanning {
-        color: orange;
-      }
-      
-      .ar-status.found {
-        color: green;
-      }
     </style>
   </head>
   <body>
-    <!-- Panel de control -->
-    <div class="control-panel">
-      <h3>🌻 Ramo de Flores Amarillas 🌻</h3>
-      <button class="btn" onclick="showMarkerModal()">📱 Ver Marcador AR</button>
-      <button class="btn" onclick="toggleView()">🌼 Ver Ramo 3D</button>
-      <button class="btn" onclick="toggleMusic()">🎵 Música</button>
-    </div>
-    
-    <!-- Estado de AR -->
-    <div class="ar-status scanning" id="arStatus">
-      📷 Buscando marcador...
-    </div>
-    
-    <!-- Modal del marcador -->
-    <div class="modal" id="markerModal">
-      <div class="modal-content">
-        <h3>📱 Marcador HIRO</h3>
-        <p>Muestra este marcador a tu cámara:</p>
-        <img src="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png" alt="HIRO Marker">
-        <p style="font-size: 0.9em; color: #666;">
-          Puedes imprimirlo o mostrarlo en otra pantalla
-        </p>
-        <a href="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png" download="hiro-marker.png" class="btn">
-          ⬇️ Descargar Marcador
-        </a>
-        <br>
-        <button class="close-modal" onclick="closeMarkerModal()">Cerrar</button>
-      </div>
-    </div>
-    
     <div id="msg">💛 Este ramo es para ti 🌻</div>
-    
-    <!-- Audio de fondo (opcional) -->
-    <audio id="bgMusic" loop>
-      <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-    </audio>
+    <div class="loading" id="loading">
+      🌼 Preparando tu ramo especial... 🌼
+    </div>
 
-    <!-- Script para animaciones y controles -->
     <script>
-      let view3DActive = false;
-      let musicPlaying = false;
-      
-      // Mostrar modal del marcador
-      function showMarkerModal() {
-        document.getElementById('markerModal').style.display = 'flex';
-      }
-      
-      // Cerrar modal del marcador
-      function closeMarkerModal() {
-        document.getElementById('markerModal').style.display = 'none';
-      }
-      
-      // Toggle vista 3D
-      function toggleView() {
-        view3DActive = !view3DActive;
-        const view3d = document.getElementById('view3d');
-        const arScene = document.getElementById('arScene');
-        const btn = event.target;
-        
-        if (view3DActive) {
-          view3d.style.display = 'block';
-          arScene.style.opacity = '0';
-          btn.classList.add('active');
-          btn.textContent = '📷 Ver en AR';
-        } else {
-          view3d.style.display = 'none';
-          arScene.style.opacity = '1';
-          btn.classList.remove('active');
-          btn.textContent = '🌼 Ver Ramo 3D';
-        }
-      }
-      
-      // Toggle música
-      function toggleMusic() {
-        const music = document.getElementById('bgMusic');
-        const btn = event.target;
-        musicPlaying = !musicPlaying;
-        
-        if (musicPlaying) {
-          // Por ahora sin música real, solo efecto visual
-          btn.classList.add('active');
-          btn.textContent = '🔇 Silenciar';
-        } else {
-          btn.classList.remove('active');
-          btn.textContent = '🎵 Música';
-        }
-      }
-      
-      // Detectar cuando se encuentra el marcador
-      document.addEventListener('DOMContentLoaded', function() {
-        const scene = document.querySelector('a-scene');
-        const marker = document.querySelector('a-marker');
-        const arStatus = document.getElementById('arStatus');
-        
-        if (marker) {
-          marker.addEventListener('markerFound', function() {
-            arStatus.textContent = '✅ ¡Marcador detectado!';
-            arStatus.classList.remove('scanning');
-            arStatus.classList.add('found');
-            
-            // Vibrar si está disponible
-            if (navigator.vibrate) {
-              navigator.vibrate(200);
-            }
-          });
-          
-          marker.addEventListener('markerLost', function() {
-            arStatus.textContent = '📷 Buscando marcador...';
-            arStatus.classList.remove('found');
-            arStatus.classList.add('scanning');
-          });
-        }
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          document.getElementById('loading').style.display = 'none';
+        }, 2000);
       });
-      
-      // Crear flores cayendo
+
       function createFlower() {
-        const flowers = ['🌼', '🌻', '🌺', '💛'];
+        const flowers = ['🌼', '🌻', '💛']; 
         const flower = document.createElement("div");
         flower.classList.add("flower");
         flower.innerHTML = flowers[Math.floor(Math.random() * flowers.length)];
@@ -352,7 +145,6 @@
         setTimeout(() => flower.remove(), 10000);
       }
       
-      // Crear pétalos cayendo
       function createPetal() {
         const petal = document.createElement("div");
         petal.classList.add("petal");
@@ -364,11 +156,10 @@
         setTimeout(() => petal.remove(), 12000);
       }
       
-      // Crear corazones flotantes
       function createHeart() {
         const heart = document.createElement("div");
         heart.classList.add("heart");
-        heart.innerHTML = "💕";
+        heart.innerHTML = "💛"; // Corazón amarillo
         heart.style.left = (10 + Math.random() * 80) + "vw";
         heart.style.bottom = "10px";
         heart.style.animationDelay = Math.random() * 3 + "s";
@@ -377,18 +168,16 @@
         setTimeout(() => heart.remove(), 8000);
       }
       
-      // Iniciar animaciones
       setInterval(createFlower, 600);
       setInterval(createPetal, 800);
       setInterval(createHeart, 3000);
       
-      // Cambiar mensaje cada cierto tiempo
       const messages = [
         "💛 Este ramo es para ti 🌻",
         "🌼 Flores amarillas como el sol 🌞",
-        "💐 Siempre floreces donde estás 🌺",
+        "💐 Siempre floreces donde estás",
         "🌻 Tu sonrisa ilumina como estas flores 💛",
-        "🌼 Un jardín de alegrías para ti 🌸"
+        "🌼 Un jardín de alegrías para ti"
       ];
       
       let msgIndex = 0;
@@ -398,9 +187,7 @@
       }, 4000);
     </script>
 
-    <!-- Componentes personalizados para A-Frame -->
     <script>
-      // Componente para movimiento suave tipo brisa
       AFRAME.registerComponent('sway', {
         schema: {
           speed: {default: 1},
@@ -415,7 +202,6 @@
         }
       });
       
-      // Componente para flotar suavemente
       AFRAME.registerComponent('float', {
         schema: {
           speed: {default: 1},
@@ -428,106 +214,226 @@
           el.object3D.position.y = Math.sin(time * 0.001 * speed) * amplitude;
         }
       });
+      
+      AFRAME.registerComponent('sunflower', {
+        schema: {
+          petalColor: {type: 'color', default: '#FFD700'},
+          centerColor: {type: 'color', default: '#8B4513'},
+          stemColor: {type: 'color', default: '#2E8B57'},
+          petalCount: {type: 'int', default: 12},
+          petalHeight: {type: 'number', default: 0.4},
+          petalRadiusBottom: {type: 'number', default: 0.1},
+          centerRadius: {type: 'number', default: 0.15},
+          stemHeight: {type: 'number', default: 1.0},
+          stemRadius: {type: 'number', default: 0.02},
+          swaySpeed: {type: 'number', default: 1.2},
+          swayAmplitude: {type: 'number', default: 4},
+          floatSpeed: {type: 'number', default: 0.8},
+          floatAmplitude: {type: 'number', default: 0.03},
+          offsetRotation: {type: 'vec3', default: {x: 0, y: 0, z: 0}},
+          offsetPosition: {type: 'vec3', default: {x: 0, y: 0, z: 0}},
+          scale: {type: 'number', default: 1} // Added scale attribute
+        },
+        init: function() {
+          const data = this.data;
+          const el = this.el;
+
+          el.setAttribute('scale', `${data.scale} ${data.scale} ${data.scale}`); // Apply scale to the sunflower itself
+
+          // Stem
+          const stem = document.createElement('a-entity');
+          stem.setAttribute('geometry', `primitive: cylinder; radius: ${data.stemRadius}; height: ${data.stemHeight}`);
+          stem.setAttribute('material', `color: ${data.stemColor}; roughness: 0.9`);
+          stem.setAttribute('position', `0 ${-data.stemHeight / 2} 0`);
+          el.appendChild(stem);
+
+          // Flower Head
+          const flowerHead = document.createElement('a-entity');
+          flowerHead.setAttribute('float', `speed: ${data.floatSpeed}; amplitude: ${data.floatAmplitude}`);
+          flowerHead.setAttribute('position', '0 0 0'); 
+          
+          // Center
+          const center = document.createElement('a-entity');
+          center.setAttribute('geometry', `primitive: sphere; radius: ${data.centerRadius}`);
+          center.setAttribute('material', `color: ${data.centerColor}; roughness: 0.7`);
+          center.setAttribute('position', '0 0 0');
+          flowerHead.appendChild(center);
+
+          // Petals
+          const petalGroup = document.createElement('a-entity');
+          petalGroup.setAttribute('rotation', '25 0 0'); 
+          flowerHead.appendChild(petalGroup);
+
+          for (let i = 0; i < data.petalCount; i++) {
+            const angle = (360 / data.petalCount) * i;
+            const petalEntity = document.createElement('a-entity');
+            petalEntity.setAttribute('geometry', `primitive: cone; height: ${data.petalHeight}; radius-bottom: ${data.petalRadiusBottom}`);
+            petalEntity.setAttribute('material', `color: ${i % 2 === 0 ? data.petalColor : '#FFEA00'}; side: double; roughness: 0.8`);
+            petalEntity.setAttribute('position', `0 ${data.petalHeight * 0.4} 0`);
+            petalEntity.setAttribute('rotation', `-90 0 0`); 
+            petalEntity.setAttribute('scale', '1 1 0.2'); 
+            petalEntity.setAttribute('sway', `speed: ${data.swaySpeed + Math.random() * 0.5}; amplitude: ${data.swayAmplitude + Math.random() * 2}`);
+            
+            const rotationWrapper = document.createElement('a-entity');
+            rotationWrapper.setAttribute('rotation', `0 0 ${angle}`);
+            rotationWrapper.appendChild(petalEntity);
+            petalGroup.appendChild(rotationWrapper);
+          }
+
+          el.appendChild(flowerHead);
+          
+          el.setAttribute('position', `${data.offsetPosition.x} ${data.offsetPosition.y} ${data.offsetPosition.z}`);
+          el.setAttribute('rotation', `${data.offsetRotation.x} ${data.offsetRotation.y} ${data.offsetRotation.z}`);
+        }
+      });
     </script>
 
-    <!-- Vista 3D sin AR -->
-    <a-scene id="view3d" embedded>
-      <a-sky color="#87CEEB"></a-sky>
-      
-      <!-- Luz ambiental -->
-      <a-light type="ambient" color="#ffffff" intensity="0.5"></a-light>
-      <a-light type="directional" color="#FFD700" position="2 4 2" intensity="0.5"></a-light>
-      
-      <!-- Ramo de flores (copia del de AR) -->
-      <a-entity id="bouquet3d" position="0 0 -3" scale="2 2 2">
-        <!-- Usar el mismo contenido del ramo AR -->
-        <a-cylinder radius="0.02" height="0.8" color="#228B22" position="0 -0.4 0"></a-cylinder>
-        <a-sphere radius="0.15" color="#8B4513" position="0 0 0"></a-sphere>
-        
-        <!-- Pétalos principales -->
-        <a-plane width="0.1" height="0.3" color="#FFD700" position="0.2 0 0" rotation="0 0 -30" side="double" sway="speed: 1.2; amplitude: 3"></a-plane>
-        <a-plane width="0.1" height="0.3" color="#FFD700" position="-0.2 0 0" rotation="0 0 30" side="double" sway="speed: 1.2; amplitude: 3"></a-plane>
-        <a-plane width="0.1" height="0.3" color="#FFEA00" position="0 0.2 0" rotation="0 0 0" side="double" sway="speed: 1; amplitude: 4"></a-plane>
-        <a-plane width="0.1" height="0.3" color="#FFEA00" position="0 -0.2 0" rotation="0 0 180" side="double" sway="speed: 1; amplitude: 4"></a-plane>
-        
-        <!-- Animación de rotación -->
-        <a-animation attribute="rotation" to="0 360 0" dur="15000" repeat="indefinite" easing="linear"></a-animation>
-      </a-entity>
-      
-      <!-- Cámara -->
-      <a-camera position="0 1 0"></a-camera>
-    </a-scene>
-
-    <!-- Escena AR principal -->
     <a-scene 
-      id="arScene"
       embedded 
-      arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+      arjs="debugUIEnabled: false; sourceType: webcam;"
       vr-mode-ui="enabled: false"
-      renderer="logarithmicDepthBuffer: true; precision: medium;">
+      renderer="logarithmicDepthBuffer: true; colorManagement: true;">
       
-      <a-marker preset="hiro" id="mainMarker">
-        <!-- Grupo principal del ramo -->
-        <a-entity id="bouquet" position="0 0.5 0">
-          
-          <!-- Girasol central grande -->
-          <a-entity>
-            <a-cylinder radius="0.02" height="0.8" color="#228B22" position="0 -0.4 0"></a-cylinder>
-            <a-sphere radius="0.15" color="#8B4513" position="0 0 0"></a-sphere>
-            
-            <!-- Pétalos del girasol central -->
-            <a-plane width="0.1" height="0.3" color="#FFD700" position="0.2 0 0" rotation="0 0 -30" side="double" sway="speed: 1.2; amplitude: 3"></a-plane>
-            <a-plane width="0.1" height="0.3" color="#FFD700" position="-0.2 0 0" rotation="0 0 30" side="double" sway="speed: 1.2; amplitude: 3"></a-plane>
-            <a-plane width="0.1" height="0.3" color="#FFEA00" position="0 0.2 0" rotation="0 0 0" side="double" sway="speed: 1; amplitude: 4"></a-plane>
-            <a-plane width="0.1" height="0.3" color="#FFEA00" position="0 -0.2 0" rotation="0 0 180" side="double" sway="speed: 1; amplitude: 4"></a-plane>
-            <a-plane width="0.1" height="0.3" color="#FFD700" position="0.14 0.14 0" rotation="0 0 -45" side="double" sway="speed: 1.3; amplitude: 3"></a-plane>
-            <a-plane width="0.1" height="0.3" color="#FFD700" position="-0.14 0.14 0" rotation="0 0 45" side="double" sway="speed: 1.3; amplitude: 3"></a-plane>
-            <a-plane width="0.1" height="0.3" color="#FFEA00" position="0.14 -0.14 0" rotation="0 0 -135" side="double" sway="speed: 1.1; amplitude: 4"></a-plane>
-            <a-plane width="0.1" height="0.3" color="#FFEA00" position="-0.14 -0.14 0" rotation="0 0 135" side="double" sway="speed: 1.1; amplitude: 4"></a-plane>
+      <a-assets>
+      </a-assets>
+      <a-light type="ambient" color="#AAA"></a-light>
+      <a-light type="directional" color="#FFF" intensity="0.7" position="-1 2 1"></a-light>
+      <a-light type="directional" color="#FFF" intensity="0.5" position="1 -1 0.5"></a-light>
+      
+      <a-marker preset="hiro">
+        <a-entity id="bouquet-container" position="0.8 0.2 -0.5" rotation="0 30 0" scale="1.5 1.5 1.5"> 
+          <a-animation
+            attribute="rotation"
+            to="0 390 0"
+            dur="25000"
+            repeat="indefinite"
+            easing="linear">
+          </a-animation>
+
+          <a-entity sunflower="
+            petalColor: #FFD700; 
+            centerColor: #8B4513; 
+            stemColor: #2E8B57; 
+            petalCount: 16; 
+            petalHeight: 0.6; 
+            petalRadiusBottom: 0.15; 
+            centerRadius: 0.2; 
+            stemHeight: 1.2; 
+            stemRadius: 0.03;
+            swaySpeed: 1.2;
+            swayAmplitude: 5;
+            floatSpeed: 0.9;
+            floatAmplitude: 0.04;
+            offsetPosition: 0 0.6 0;
+            offsetRotation: 0 0 0;
+            scale: 1"> </a-entity>
+
+          <a-entity sunflower="
+            petalColor: #FFEA00; 
+            centerColor: #A0522D; 
+            stemColor: #3CB371; 
+            petalCount: 12; 
+            petalHeight: 0.5; 
+            petalRadiusBottom: 0.1; 
+            centerRadius: 0.12; 
+            stemHeight: 1.0; 
+            stemRadius: 0.025;
+            swaySpeed: 1.5;
+            swayAmplitude: 6;
+            floatSpeed: 1.1;
+            floatAmplitude: 0.05;
+            offsetPosition: -0.4 0.4 -0.2;
+            offsetRotation: 0 0 -15;
+            scale: 0.8"> 
+          </a-entity>
+
+          <a-entity sunflower="
+            petalColor: #FFD700; 
+            centerColor: #A0522D; 
+            stemColor: #3CB371; 
+            petalCount: 14; 
+            petalHeight: 0.55; 
+            petalRadiusBottom: 0.12; 
+            centerRadius: 0.13; 
+            stemHeight: 1.1; 
+            stemRadius: 0.028;
+            swaySpeed: 1.3;
+            swayAmplitude: 7;
+            floatSpeed: 1.0;
+            floatAmplitude: 0.04;
+            offsetPosition: 0.4 0.5 0.1;
+            offsetRotation: 0 0 10;
+            scale: 0.9"> 
+          </a-entity>
+
+          <a-entity sunflower="
+            petalColor: #FFEA00; 
+            centerColor: #CD853F; 
+            stemColor: #6B8E23; 
+            petalCount: 10; 
+            petalHeight: 0.4; 
+            petalRadiusBottom: 0.08; 
+            centerRadius: 0.1; 
+            stemHeight: 0.8; 
+            stemRadius: 0.02;
+            swaySpeed: 1.7;
+            swayAmplitude: 4;
+            floatSpeed: 1.2;
+            floatAmplitude: 0.03;
+            offsetPosition: 0 0.3 0.3;
+            offsetRotation: 0 0 5;
+            scale: 0.7"> 
           </a-entity>
           
-          <!-- Girasol izquierdo -->
-          <a-entity position="-0.4 -0.1 0.1" rotation="0 0 -15">
-            <a-cylinder radius="0.015" height="0.6" color="#228B22" position="0 -0.3 0"></a-cylinder>
-            <a-sphere radius="0.1" color="#8B4513" position="0 0 0" float="speed: 1.5; amplitude: 0.05"></a-sphere>
-            <a-plane width="0.08" height="0.2" color="#FFD700" position="0.12 0 0" side="double" sway="speed: 1.4; amplitude: 5"></a-plane>
-            <a-plane width="0.08" height="0.2" color="#FFD700" position="-0.12 0 0" side="double" sway="speed: 1.4; amplitude: 5"></a-plane>
-            <a-plane width="0.08" height="0.2" color="#FFEA00" position="0 0.12 0" side="double" sway="speed: 1.2; amplitude: 6"></a-plane>
-            <a-plane width="0.08" height="0.2" color="#FFEA00" position="0 -0.12 0" side="double" sway="speed: 1.2; amplitude: 6"></a-plane>
+          <a-entity
+            geometry="primitive: cone; height: 0.4; radius-bottom: 0.15"
+            material="color: #228B22; side: double; roughness: 0.9"
+            position="-0.3 -0.1 0.1"
+            rotation="-100 0 -60"
+            scale="1 1 0.18"
+            sway="speed: 0.8; amplitude: 3">
           </a-entity>
-          
-          <!-- Girasol derecho -->
-          <a-entity position="0.4 -0.1 0.1" rotation="0 0 15">
-            <a-cylinder radius="0.015" height="0.6" color="#228B22" position="0 -0.3 0"></a-cylinder>
-            <a-sphere radius="0.1" color="#8B4513" position="0 0 0" float="speed: 1.3; amplitude: 0.05"></a-sphere>
-            <a-plane width="0.08" height="0.2" color="#FFD700" position="0.12 0 0" side="double" sway="speed: 1.6; amplitude: 5"></a-plane>
-            <a-plane width="0.08" height="0.2" color="#FFD700" position="-0.12 0 0" side="double" sway="speed: 1.6; amplitude: 5"></a-plane>
-            <a-plane width="0.08" height="0.2" color="#FFEA00" position="0 0.12 0" side="double" sway="speed: 1.3; amplitude: 6"></a-plane>
-            <a-plane width="0.08" height="0.2" color="#FFEA00" position="0 -0.12 0" side="double" sway="speed: 1.3; amplitude: 6"></a-plane>
+          <a-entity
+            geometry="primitive: cone; height: 0.4; radius-bottom: 0.15"
+            material="color: #228B22; side: double; roughness: 0.9"
+            position="0.3 -0.1 0.1"
+            rotation="-100 0 60"
+            scale="1 1 0.18"
+            sway="speed: 0.8; amplitude: 3">
           </a-entity>
-          
-          <!-- Hojas decorativas -->
-          <a-plane width="0.08" height="0.15" color="#228B22" position="-0.25 -0.4 0" rotation="0 0 -45" side="double" sway="speed: 0.8; amplitude: 2"></a-plane>
-          <a-plane width="0.08" height="0.15" color="#228B22" position="0.25 -0.4 0" rotation="0 0 45" side="double" sway="speed: 0.8; amplitude: 2"></a-plane>
-          
-          <!-- Animación de rotación suave -->
-          <a-animation attribute="rotation" to="0 360 0" dur="20000" repeat="indefinite" easing="linear"></a-animation>
+          <a-entity
+            geometry="primitive: cone; height: 0.3; radius-bottom: 0.12"
+            material="color: #3CB371; side: double; roughness: 0.9"
+            position="0 -0.2 -0.2"
+            rotation="-110 0 0"
+            scale="1 1 0.15"
+            sway="speed: 0.9; amplitude: 2">
+          </a-entity>
+
         </a-entity>
         
-        <!-- Texto 3D -->
-        <a-text value="Para Ti" color="#FFD700" position="0 1.2 0" align="center" width="3" font="kelsonsans"
-                animation="property: position; to: 0 1.4 0; dir: alternate; dur: 2000; loop: true; easing: easeInOutSine">
+        <a-text
+          value=""
+          color="#FFD700"
+          position="0 2.2 0" 
+          align="center"
+          width="4"
+          font="kelsonsans"
+          animation="property: position; to: 0 2.4 0; dir: alternate; dur: 2000; loop: true; easing: easeInOutSine">
         </a-text>
         
-        <!-- Partículas de luz -->
-        <a-sphere radius="0.02" color="#FFFACD" position="0.3 0.8 0.2" 
-                  material="emissive: #FFFACD; emissiveIntensity: 0.5"
-                  animation="property: position; to: -0.3 0.2 -0.2; dir: alternate; dur: 3000; loop: true">
-        </a-sphere>
-        <a-sphere radius="0.02" color="#FFFACD" position="-0.3 0.6 -0.2" 
-                  material="emissive: #FFFACD; emissiveIntensity: 0.5"
-                  animation="property: position; to: 0.3 0.9 0.2; dir: alternate; dur: 3500; loop: true">
-        </a-sphere>
+        <a-entity
+          geometry="primitive: sphere; radius: 0.02"
+          material="shader: flat; color: #FFFACD;"
+          position="0.3 0.8 0.2"
+          animation="property: position; to: -0.3 0.2 -0.2; dir: alternate; dur: 3000; loop: true">
+        </a-entity>
+        <a-entity
+          geometry="primitive: sphere; radius: 0.02"
+          material="shader: flat; color: #FFFACD;"
+          position="-0.3 0.6 -0.2"
+          animation="property: position; to: 0.3 0.9 0.2; dir: alternate; dur: 3500; loop: true">
+        </a-entity>
       </a-marker>
 
       <a-entity camera></a-entity>
