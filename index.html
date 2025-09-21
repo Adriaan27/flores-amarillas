@@ -81,18 +81,6 @@
         }
       }
       
-      .loading {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: white;
-        font-family: Arial, sans-serif;
-        font-size: 1.2em;
-        z-index: 100;
-        text-align: center;
-      }
-      
       .heart {
         position: fixed;
         color: #ff69b4;
@@ -117,23 +105,239 @@
           opacity: 0.6;
         }
       }
+      
+      /* Panel de control */
+      .control-panel {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.9);
+        padding: 15px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        z-index: 100;
+        text-align: center;
+        max-width: 90%;
+      }
+      
+      .control-panel h3 {
+        color: #764ba2;
+        margin-bottom: 10px;
+        font-size: 1.2em;
+      }
+      
+      .btn {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin: 5px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: all 0.3s;
+      }
+      
+      .btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+      
+      .btn.active {
+        background: #FFD700;
+        color: #333;
+      }
+      
+      /* Modal para el marcador */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 200;
+        justify-content: center;
+        align-items: center;
+      }
+      
+      .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        max-width: 400px;
+        margin: 20px;
+      }
+      
+      .modal img {
+        width: 100%;
+        max-width: 300px;
+        margin: 15px 0;
+        border: 2px solid #764ba2;
+        border-radius: 10px;
+      }
+      
+      .close-modal {
+        background: #ff4444;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      
+      /* Vista 3D sin AR */
+      #view3d {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        max-width: 500px;
+        height: 60vh;
+        z-index: 50;
+      }
+      
+      .ar-status {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(255,255,255,0.9);
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        z-index: 90;
+      }
+      
+      .ar-status.scanning {
+        color: orange;
+      }
+      
+      .ar-status.found {
+        color: green;
+      }
     </style>
   </head>
   <body>
-    <div id="msg">💛 Este ramo es para ti 🌻</div>
-    <div class="loading" id="loading">
-      🌼 Preparando tu ramo especial... 🌼
+    <!-- Panel de control -->
+    <div class="control-panel">
+      <h3>🌻 Ramo de Flores Amarillas 🌻</h3>
+      <button class="btn" onclick="showMarkerModal()">📱 Ver Marcador AR</button>
+      <button class="btn" onclick="toggleView()">🌼 Ver Ramo 3D</button>
+      <button class="btn" onclick="toggleMusic()">🎵 Música</button>
     </div>
+    
+    <!-- Estado de AR -->
+    <div class="ar-status scanning" id="arStatus">
+      📷 Buscando marcador...
+    </div>
+    
+    <!-- Modal del marcador -->
+    <div class="modal" id="markerModal">
+      <div class="modal-content">
+        <h3>📱 Marcador HIRO</h3>
+        <p>Muestra este marcador a tu cámara:</p>
+        <img src="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png" alt="HIRO Marker">
+        <p style="font-size: 0.9em; color: #666;">
+          Puedes imprimirlo o mostrarlo en otra pantalla
+        </p>
+        <a href="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png" download="hiro-marker.png" class="btn">
+          ⬇️ Descargar Marcador
+        </a>
+        <br>
+        <button class="close-modal" onclick="closeMarkerModal()">Cerrar</button>
+      </div>
+    </div>
+    
+    <div id="msg">💛 Este ramo es para ti 🌻</div>
+    
+    <!-- Audio de fondo (opcional) -->
+    <audio id="bgMusic" loop>
+      <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
 
-    <!-- Script mejorado para la lluvia de flores -->
+    <!-- Script para animaciones y controles -->
     <script>
-      // Ocultar mensaje de carga cuando la escena esté lista
-      window.addEventListener('load', () => {
-        setTimeout(() => {
-          document.getElementById('loading').style.display = 'none';
-        }, 2000);
+      let view3DActive = false;
+      let musicPlaying = false;
+      
+      // Mostrar modal del marcador
+      function showMarkerModal() {
+        document.getElementById('markerModal').style.display = 'flex';
+      }
+      
+      // Cerrar modal del marcador
+      function closeMarkerModal() {
+        document.getElementById('markerModal').style.display = 'none';
+      }
+      
+      // Toggle vista 3D
+      function toggleView() {
+        view3DActive = !view3DActive;
+        const view3d = document.getElementById('view3d');
+        const arScene = document.getElementById('arScene');
+        const btn = event.target;
+        
+        if (view3DActive) {
+          view3d.style.display = 'block';
+          arScene.style.opacity = '0';
+          btn.classList.add('active');
+          btn.textContent = '📷 Ver en AR';
+        } else {
+          view3d.style.display = 'none';
+          arScene.style.opacity = '1';
+          btn.classList.remove('active');
+          btn.textContent = '🌼 Ver Ramo 3D';
+        }
+      }
+      
+      // Toggle música
+      function toggleMusic() {
+        const music = document.getElementById('bgMusic');
+        const btn = event.target;
+        musicPlaying = !musicPlaying;
+        
+        if (musicPlaying) {
+          // Por ahora sin música real, solo efecto visual
+          btn.classList.add('active');
+          btn.textContent = '🔇 Silenciar';
+        } else {
+          btn.classList.remove('active');
+          btn.textContent = '🎵 Música';
+        }
+      }
+      
+      // Detectar cuando se encuentra el marcador
+      document.addEventListener('DOMContentLoaded', function() {
+        const scene = document.querySelector('a-scene');
+        const marker = document.querySelector('a-marker');
+        const arStatus = document.getElementById('arStatus');
+        
+        if (marker) {
+          marker.addEventListener('markerFound', function() {
+            arStatus.textContent = '✅ ¡Marcador detectado!';
+            arStatus.classList.remove('scanning');
+            arStatus.classList.add('found');
+            
+            // Vibrar si está disponible
+            if (navigator.vibrate) {
+              navigator.vibrate(200);
+            }
+          });
+          
+          marker.addEventListener('markerLost', function() {
+            arStatus.textContent = '📷 Buscando marcador...';
+            arStatus.classList.remove('found');
+            arStatus.classList.add('scanning');
+          });
+        }
       });
-
+      
       // Crear flores cayendo
       function createFlower() {
         const flowers = ['🌼', '🌻', '🌺', '💛'];
@@ -194,7 +398,7 @@
       }, 4000);
     </script>
 
-    <!-- Escena AR con componentes personalizados -->
+    <!-- Componentes personalizados para A-Frame -->
     <script>
       // Componente para movimiento suave tipo brisa
       AFRAME.registerComponent('sway', {
@@ -226,256 +430,104 @@
       });
     </script>
 
-    <!-- Escena AR mejorada -->
+    <!-- Vista 3D sin AR -->
+    <a-scene id="view3d" embedded>
+      <a-sky color="#87CEEB"></a-sky>
+      
+      <!-- Luz ambiental -->
+      <a-light type="ambient" color="#ffffff" intensity="0.5"></a-light>
+      <a-light type="directional" color="#FFD700" position="2 4 2" intensity="0.5"></a-light>
+      
+      <!-- Ramo de flores (copia del de AR) -->
+      <a-entity id="bouquet3d" position="0 0 -3" scale="2 2 2">
+        <!-- Usar el mismo contenido del ramo AR -->
+        <a-cylinder radius="0.02" height="0.8" color="#228B22" position="0 -0.4 0"></a-cylinder>
+        <a-sphere radius="0.15" color="#8B4513" position="0 0 0"></a-sphere>
+        
+        <!-- Pétalos principales -->
+        <a-plane width="0.1" height="0.3" color="#FFD700" position="0.2 0 0" rotation="0 0 -30" side="double" sway="speed: 1.2; amplitude: 3"></a-plane>
+        <a-plane width="0.1" height="0.3" color="#FFD700" position="-0.2 0 0" rotation="0 0 30" side="double" sway="speed: 1.2; amplitude: 3"></a-plane>
+        <a-plane width="0.1" height="0.3" color="#FFEA00" position="0 0.2 0" rotation="0 0 0" side="double" sway="speed: 1; amplitude: 4"></a-plane>
+        <a-plane width="0.1" height="0.3" color="#FFEA00" position="0 -0.2 0" rotation="0 0 180" side="double" sway="speed: 1; amplitude: 4"></a-plane>
+        
+        <!-- Animación de rotación -->
+        <a-animation attribute="rotation" to="0 360 0" dur="15000" repeat="indefinite" easing="linear"></a-animation>
+      </a-entity>
+      
+      <!-- Cámara -->
+      <a-camera position="0 1 0"></a-camera>
+    </a-scene>
+
+    <!-- Escena AR principal -->
     <a-scene 
+      id="arScene"
       embedded 
-      arjs="debugUIEnabled: false; sourceType: webcam;"
+      arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
       vr-mode-ui="enabled: false"
-      renderer="logarithmicDepthBuffer: true; colorManagement: true;">
+      renderer="logarithmicDepthBuffer: true; precision: medium;">
       
-      <a-assets>
-        <!-- Precargar assets para mejor rendimiento -->
-      </a-assets>
-      
-      <a-marker preset="hiro">
+      <a-marker preset="hiro" id="mainMarker">
         <!-- Grupo principal del ramo -->
         <a-entity id="bouquet" position="0 0.5 0">
           
           <!-- Girasol central grande -->
-          <a-entity
-            geometry="primitive: cylinder; radius: 0.02; height: 0.8"
-            material="color: #228B22"
-            position="0 -0.4 0">
-          </a-entity>
-          <a-entity
-            geometry="primitive: sphere; radius: 0.15"
-            material="color: #8B4513"
-            position="0 0 0">
-          </a-entity>
-          <a-entity position="0 0 0">
+          <a-entity>
+            <a-cylinder radius="0.02" height="0.8" color="#228B22" position="0 -0.4 0"></a-cylinder>
+            <a-sphere radius="0.15" color="#8B4513" position="0 0 0"></a-sphere>
+            
             <!-- Pétalos del girasol central -->
-            <a-entity
-              geometry="primitive: plane; width: 0.1; height: 0.3"
-              material="color: #FFD700; side: double"
-              position="0.2 0 0"
-              rotation="0 0 -30"
-              sway="speed: 1.2; amplitude: 3">
-            </a-entity>
-            <a-entity
-              geometry="primitive: plane; width: 0.1; height: 0.3"
-              material="color: #FFD700; side: double"
-              position="-0.2 0 0"
-              rotation="0 0 30"
-              sway="speed: 1.2; amplitude: 3">
-            </a-entity>
-            <a-entity
-              geometry="primitive: plane; width: 0.1; height: 0.3"
-              material="color: #FFEA00; side: double"
-              position="0 0.2 0"
-              rotation="0 0 0"
-              sway="speed: 1; amplitude: 4">
-            </a-entity>
-            <a-entity
-              geometry="primitive: plane; width: 0.1; height: 0.3"
-              material="color: #FFEA00; side: double"
-              position="0 -0.2 0"
-              rotation="0 0 180"
-              sway="speed: 1; amplitude: 4">
-            </a-entity>
-            <!-- Más pétalos -->
-            <a-entity
-              geometry="primitive: plane; width: 0.1; height: 0.3"
-              material="color: #FFD700; side: double"
-              position="0.14 0.14 0"
-              rotation="0 0 -45"
-              sway="speed: 1.3; amplitude: 3">
-            </a-entity>
-            <a-entity
-              geometry="primitive: plane; width: 0.1; height: 0.3"
-              material="color: #FFD700; side: double"
-              position="-0.14 0.14 0"
-              rotation="0 0 45"
-              sway="speed: 1.3; amplitude: 3">
-            </a-entity>
-            <a-entity
-              geometry="primitive: plane; width: 0.1; height: 0.3"
-              material="color: #FFEA00; side: double"
-              position="0.14 -0.14 0"
-              rotation="0 0 -135"
-              sway="speed: 1.1; amplitude: 4">
-            </a-entity>
-            <a-entity
-              geometry="primitive: plane; width: 0.1; height: 0.3"
-              material="color: #FFEA00; side: double"
-              position="-0.14 -0.14 0"
-              rotation="0 0 135"
-              sway="speed: 1.1; amplitude: 4">
-            </a-entity>
+            <a-plane width="0.1" height="0.3" color="#FFD700" position="0.2 0 0" rotation="0 0 -30" side="double" sway="speed: 1.2; amplitude: 3"></a-plane>
+            <a-plane width="0.1" height="0.3" color="#FFD700" position="-0.2 0 0" rotation="0 0 30" side="double" sway="speed: 1.2; amplitude: 3"></a-plane>
+            <a-plane width="0.1" height="0.3" color="#FFEA00" position="0 0.2 0" rotation="0 0 0" side="double" sway="speed: 1; amplitude: 4"></a-plane>
+            <a-plane width="0.1" height="0.3" color="#FFEA00" position="0 -0.2 0" rotation="0 0 180" side="double" sway="speed: 1; amplitude: 4"></a-plane>
+            <a-plane width="0.1" height="0.3" color="#FFD700" position="0.14 0.14 0" rotation="0 0 -45" side="double" sway="speed: 1.3; amplitude: 3"></a-plane>
+            <a-plane width="0.1" height="0.3" color="#FFD700" position="-0.14 0.14 0" rotation="0 0 45" side="double" sway="speed: 1.3; amplitude: 3"></a-plane>
+            <a-plane width="0.1" height="0.3" color="#FFEA00" position="0.14 -0.14 0" rotation="0 0 -135" side="double" sway="speed: 1.1; amplitude: 4"></a-plane>
+            <a-plane width="0.1" height="0.3" color="#FFEA00" position="-0.14 -0.14 0" rotation="0 0 135" side="double" sway="speed: 1.1; amplitude: 4"></a-plane>
           </a-entity>
           
           <!-- Girasol izquierdo -->
           <a-entity position="-0.4 -0.1 0.1" rotation="0 0 -15">
-            <a-entity
-              geometry="primitive: cylinder; radius: 0.015; height: 0.6"
-              material="color: #228B22"
-              position="0 -0.3 0">
-            </a-entity>
-            <a-entity
-              geometry="primitive: sphere; radius: 0.1"
-              material="color: #8B4513"
-              position="0 0 0"
-              float="speed: 1.5; amplitude: 0.05">
-            </a-entity>
-            <!-- Pétalos -->
-            <a-entity position="0 0 0">
-              <a-entity
-                geometry="primitive: plane; width: 0.08; height: 0.2"
-                material="color: #FFD700; side: double"
-                position="0.12 0 0"
-                sway="speed: 1.4; amplitude: 5">
-              </a-entity>
-              <a-entity
-                geometry="primitive: plane; width: 0.08; height: 0.2"
-                material="color: #FFD700; side: double"
-                position="-0.12 0 0"
-                sway="speed: 1.4; amplitude: 5">
-              </a-entity>
-              <a-entity
-                geometry="primitive: plane; width: 0.08; height: 0.2"
-                material="color: #FFEA00; side: double"
-                position="0 0.12 0"
-                sway="speed: 1.2; amplitude: 6">
-              </a-entity>
-              <a-entity
-                geometry="primitive: plane; width: 0.08; height: 0.2"
-                material="color: #FFEA00; side: double"
-                position="0 -0.12 0"
-                sway="speed: 1.2; amplitude: 6">
-              </a-entity>
-            </a-entity>
+            <a-cylinder radius="0.015" height="0.6" color="#228B22" position="0 -0.3 0"></a-cylinder>
+            <a-sphere radius="0.1" color="#8B4513" position="0 0 0" float="speed: 1.5; amplitude: 0.05"></a-sphere>
+            <a-plane width="0.08" height="0.2" color="#FFD700" position="0.12 0 0" side="double" sway="speed: 1.4; amplitude: 5"></a-plane>
+            <a-plane width="0.08" height="0.2" color="#FFD700" position="-0.12 0 0" side="double" sway="speed: 1.4; amplitude: 5"></a-plane>
+            <a-plane width="0.08" height="0.2" color="#FFEA00" position="0 0.12 0" side="double" sway="speed: 1.2; amplitude: 6"></a-plane>
+            <a-plane width="0.08" height="0.2" color="#FFEA00" position="0 -0.12 0" side="double" sway="speed: 1.2; amplitude: 6"></a-plane>
           </a-entity>
           
           <!-- Girasol derecho -->
           <a-entity position="0.4 -0.1 0.1" rotation="0 0 15">
-            <a-entity
-              geometry="primitive: cylinder; radius: 0.015; height: 0.6"
-              material="color: #228B22"
-              position="0 -0.3 0">
-            </a-entity>
-            <a-entity
-              geometry="primitive: sphere; radius: 0.1"
-              material="color: #8B4513"
-              position="0 0 0"
-              float="speed: 1.3; amplitude: 0.05">
-            </a-entity>
-            <!-- Pétalos -->
-            <a-entity position="0 0 0">
-              <a-entity
-                geometry="primitive: plane; width: 0.08; height: 0.2"
-                material="color: #FFD700; side: double"
-                position="0.12 0 0"
-                sway="speed: 1.6; amplitude: 5">
-              </a-entity>
-              <a-entity
-                geometry="primitive: plane; width: 0.08; height: 0.2"
-                material="color: #FFD700; side: double"
-                position="-0.12 0 0"
-                sway="speed: 1.6; amplitude: 5">
-              </a-entity>
-              <a-entity
-                geometry="primitive: plane; width: 0.08; height: 0.2"
-                material="color: #FFEA00; side: double"
-                position="0 0.12 0"
-                sway="speed: 1.3; amplitude: 6">
-              </a-entity>
-              <a-entity
-                geometry="primitive: plane; width: 0.08; height: 0.2"
-                material="color: #FFEA00; side: double"
-                position="0 -0.12 0"
-                sway="speed: 1.3; amplitude: 6">
-              </a-entity>
-            </a-entity>
-          </a-entity>
-          
-          <!-- Flores pequeñas adicionales -->
-          <a-entity position="-0.2 -0.2 -0.1" rotation="0 0 -10">
-            <a-entity
-              geometry="primitive: cylinder; radius: 0.01; height: 0.4"
-              material="color: #228B22"
-              position="0 -0.2 0">
-            </a-entity>
-            <a-entity
-              geometry="primitive: sphere; radius: 0.06"
-              material="color: #FFA500"
-              position="0 0 0"
-              float="speed: 2; amplitude: 0.03">
-            </a-entity>
-          </a-entity>
-          
-          <a-entity position="0.2 -0.2 -0.1" rotation="0 0 10">
-            <a-entity
-              geometry="primitive: cylinder; radius: 0.01; height: 0.4"
-              material="color: #228B22"
-              position="0 -0.2 0">
-            </a-entity>
-            <a-entity
-              geometry="primitive: sphere; radius: 0.06"
-              material="color: #FFA500"
-              position="0 0 0"
-              float="speed: 1.8; amplitude: 0.03">
-            </a-entity>
+            <a-cylinder radius="0.015" height="0.6" color="#228B22" position="0 -0.3 0"></a-cylinder>
+            <a-sphere radius="0.1" color="#8B4513" position="0 0 0" float="speed: 1.3; amplitude: 0.05"></a-sphere>
+            <a-plane width="0.08" height="0.2" color="#FFD700" position="0.12 0 0" side="double" sway="speed: 1.6; amplitude: 5"></a-plane>
+            <a-plane width="0.08" height="0.2" color="#FFD700" position="-0.12 0 0" side="double" sway="speed: 1.6; amplitude: 5"></a-plane>
+            <a-plane width="0.08" height="0.2" color="#FFEA00" position="0 0.12 0" side="double" sway="speed: 1.3; amplitude: 6"></a-plane>
+            <a-plane width="0.08" height="0.2" color="#FFEA00" position="0 -0.12 0" side="double" sway="speed: 1.3; amplitude: 6"></a-plane>
           </a-entity>
           
           <!-- Hojas decorativas -->
-          <a-entity
-            geometry="primitive: plane; width: 0.08; height: 0.15"
-            material="color: #228B22; side: double"
-            position="-0.25 -0.4 0"
-            rotation="0 0 -45"
-            sway="speed: 0.8; amplitude: 2">
-          </a-entity>
-          <a-entity
-            geometry="primitive: plane; width: 0.08; height: 0.15"
-            material="color: #228B22; side: double"
-            position="0.25 -0.4 0"
-            rotation="0 0 45"
-            sway="speed: 0.8; amplitude: 2">
-          </a-entity>
+          <a-plane width="0.08" height="0.15" color="#228B22" position="-0.25 -0.4 0" rotation="0 0 -45" side="double" sway="speed: 0.8; amplitude: 2"></a-plane>
+          <a-plane width="0.08" height="0.15" color="#228B22" position="0.25 -0.4 0" rotation="0 0 45" side="double" sway="speed: 0.8; amplitude: 2"></a-plane>
           
-          <!-- Animación de rotación suave del ramo completo -->
-          <a-animation
-            attribute="rotation"
-            to="0 360 0"
-            dur="20000"
-            repeat="indefinite"
-            easing="linear">
-          </a-animation>
+          <!-- Animación de rotación suave -->
+          <a-animation attribute="rotation" to="0 360 0" dur="20000" repeat="indefinite" easing="linear"></a-animation>
         </a-entity>
         
-        <!-- Texto 3D flotante -->
-        <a-text
-          value="Para Ti"
-          color="#FFD700"
-          position="0 1.2 0"
-          align="center"
-          width="3"
-          font="kelsonsans"
-          animation="property: position; to: 0 1.4 0; dir: alternate; dur: 2000; loop: true; easing: easeInOutSine">
+        <!-- Texto 3D -->
+        <a-text value="Para Ti" color="#FFD700" position="0 1.2 0" align="center" width="3" font="kelsonsans"
+                animation="property: position; to: 0 1.4 0; dir: alternate; dur: 2000; loop: true; easing: easeInOutSine">
         </a-text>
         
         <!-- Partículas de luz -->
-        <a-entity
-          geometry="primitive: sphere; radius: 0.02"
-          material="color: #FFFACD; emissive: #FFFACD; emissiveIntensity: 0.5"
-          position="0.3 0.8 0.2"
-          animation="property: position; to: -0.3 0.2 -0.2; dir: alternate; dur: 3000; loop: true">
-        </a-entity>
-        <a-entity
-          geometry="primitive: sphere; radius: 0.02"
-          material="color: #FFFACD; emissive: #FFFACD; emissiveIntensity: 0.5"
-          position="-0.3 0.6 -0.2"
-          animation="property: position; to: 0.3 0.9 0.2; dir: alternate; dur: 3500; loop: true">
-        </a-entity>
+        <a-sphere radius="0.02" color="#FFFACD" position="0.3 0.8 0.2" 
+                  material="emissive: #FFFACD; emissiveIntensity: 0.5"
+                  animation="property: position; to: -0.3 0.2 -0.2; dir: alternate; dur: 3000; loop: true">
+        </a-sphere>
+        <a-sphere radius="0.02" color="#FFFACD" position="-0.3 0.6 -0.2" 
+                  material="emissive: #FFFACD; emissiveIntensity: 0.5"
+                  animation="property: position; to: 0.3 0.9 0.2; dir: alternate; dur: 3500; loop: true">
+        </a-sphere>
       </a-marker>
 
       <a-entity camera></a-entity>
