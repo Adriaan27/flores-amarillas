@@ -31,8 +31,21 @@
         z-index: 10;
         animation: pulse 2s ease-in-out infinite;
         letter-spacing: 2px;
+        /* Evita que el texto sea seleccionable accidentalmente en el móvil */
+        user-select: none;
+        -webkit-user-select: none;
       }
       
+      /* [NUEVO] ESTILOS RESPONSIVOS PARA CELULARES */
+      @media (max-width: 768px) {
+        #msg {
+          /* Usamos vmin para que el tamaño se base en la dimensión más pequeña de la pantalla */
+          font-size: 6vmin;
+          bottom: 20px; /* Lo acercamos un poco más al borde */
+          text-shadow: 2px 2px 8px rgba(0,0,0,0.7); /* Sombra más sutil */
+        }
+      }
+
       @keyframes pulse {
         0%, 100% { transform: scale(1); }
         50% { transform: scale(1.05); }
@@ -232,13 +245,13 @@
           floatAmplitude: {type: 'number', default: 0.03},
           offsetRotation: {type: 'vec3', default: {x: 0, y: 0, z: 0}},
           offsetPosition: {type: 'vec3', default: {x: 0, y: 0, z: 0}},
-          scale: {type: 'number', default: 1} // Added scale attribute
+          scale: {type: 'number', default: 1}
         },
         init: function() {
           const data = this.data;
           const el = this.el;
 
-          el.setAttribute('scale', `${data.scale} ${data.scale} ${data.scale}`); // Apply scale to the sunflower itself
+          el.setAttribute('scale', `${data.scale} ${data.scale} ${data.scale}`);
 
           // Stem
           const stem = document.createElement('a-entity');
@@ -276,7 +289,7 @@
             
             const rotationWrapper = document.createElement('a-entity');
             rotationWrapper.setAttribute('rotation', `0 0 ${angle}`);
-            rotationWrapper.appendChild(petalEntity);
+            rotationWrapper.appendChild( petalEntity);
             petalGroup.appendChild(rotationWrapper);
           }
 
@@ -413,7 +426,7 @@
         </a-entity>
         
         <a-text
-          value=""
+          value="Para Ti"
           color="#FFD700"
           position="0 2.2 0" 
           align="center"
