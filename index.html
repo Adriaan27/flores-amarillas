@@ -1,79 +1,480 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Flores Amarillas 🌼</title>
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.0.5/aframe/build/aframe-ar.js"></script>
+    <title>Flores Amarillas 🌼 | Para Ti</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
     <style>
-      body { margin: 0; overflow: hidden; }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body { 
+        margin: 0; 
+        overflow: hidden;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+      
       #msg {
         position: absolute;
-        bottom: 20px;
+        bottom: 30px;
         width: 100%;
         text-align: center;
-        font-size: 1.5em;
+        font-size: 1.8em;
         color: #FFD700;
-        font-family: 'Arial', sans-serif;
-        text-shadow: 2px 2px 5px black;
-        z-index: 2;
+        font-family: 'Georgia', serif;
+        text-shadow: 3px 3px 10px rgba(0,0,0,0.7);
+        z-index: 10;
+        animation: pulse 2s ease-in-out infinite;
+        letter-spacing: 2px;
       }
+      
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+      }
+      
       .flower {
         position: fixed;
         top: -50px;
-        font-size: 24px;
+        font-size: 30px;
         color: #FFD700;
         animation: fall linear infinite;
+        filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+        z-index: 5;
       }
+      
       @keyframes fall {
         to {
           transform: translateY(110vh) rotate(360deg);
+        }
+      }
+      
+      .petal {
+        position: fixed;
+        width: 15px;
+        height: 20px;
+        background: linear-gradient(45deg, #FFD700, #FFA500);
+        border-radius: 0 50% 50% 50%;
+        animation: petalFall linear infinite;
+        opacity: 0.8;
+      }
+      
+      @keyframes petalFall {
+        0% {
+          transform: translateY(-20px) rotate(0deg);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.8;
+        }
+        90% {
+          opacity: 0.8;
+        }
+        100% {
+          transform: translateY(110vh) rotate(720deg);
+          opacity: 0;
+        }
+      }
+      
+      .loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-family: Arial, sans-serif;
+        font-size: 1.2em;
+        z-index: 100;
+        text-align: center;
+      }
+      
+      .heart {
+        position: fixed;
+        color: #ff69b4;
+        font-size: 20px;
+        animation: floatHeart 8s infinite ease-in-out;
+        opacity: 0.6;
+      }
+      
+      @keyframes floatHeart {
+        0%, 100% { 
+          transform: translateY(0) translateX(0) scale(1); 
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.6;
+        }
+        50% { 
+          transform: translateY(-50vh) translateX(30px) scale(1.2); 
+          opacity: 0.8;
+        }
+        90% {
+          opacity: 0.6;
         }
       }
     </style>
   </head>
   <body>
     <div id="msg">💛 Este ramo es para ti 🌻</div>
+    <div class="loading" id="loading">
+      🌼 Preparando tu ramo especial... 🌼
+    </div>
 
-    <!-- Animación lluvia de flores -->
+    <!-- Script mejorado para la lluvia de flores -->
     <script>
+      // Ocultar mensaje de carga cuando la escena esté lista
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          document.getElementById('loading').style.display = 'none';
+        }, 2000);
+      });
+
+      // Crear flores cayendo
       function createFlower() {
+        const flowers = ['🌼', '🌻', '🌺', '💛'];
         const flower = document.createElement("div");
         flower.classList.add("flower");
-        flower.innerHTML = "🌼";
+        flower.innerHTML = flowers[Math.floor(Math.random() * flowers.length)];
         flower.style.left = Math.random() * 100 + "vw";
-        flower.style.animationDuration = (3 + Math.random() * 5) + "s";
+        flower.style.animationDuration = (4 + Math.random() * 6) + "s";
+        flower.style.fontSize = (20 + Math.random() * 20) + "px";
         document.body.appendChild(flower);
 
-        setTimeout(() => flower.remove(), 8000);
+        setTimeout(() => flower.remove(), 10000);
       }
-      setInterval(createFlower, 500);
+      
+      // Crear pétalos cayendo
+      function createPetal() {
+        const petal = document.createElement("div");
+        petal.classList.add("petal");
+        petal.style.left = Math.random() * 100 + "vw";
+        petal.style.animationDuration = (5 + Math.random() * 5) + "s";
+        petal.style.animationDelay = Math.random() * 2 + "s";
+        document.body.appendChild(petal);
+
+        setTimeout(() => petal.remove(), 12000);
+      }
+      
+      // Crear corazones flotantes
+      function createHeart() {
+        const heart = document.createElement("div");
+        heart.classList.add("heart");
+        heart.innerHTML = "💕";
+        heart.style.left = (10 + Math.random() * 80) + "vw";
+        heart.style.bottom = "10px";
+        heart.style.animationDelay = Math.random() * 3 + "s";
+        document.body.appendChild(heart);
+
+        setTimeout(() => heart.remove(), 8000);
+      }
+      
+      // Iniciar animaciones
+      setInterval(createFlower, 600);
+      setInterval(createPetal, 800);
+      setInterval(createHeart, 3000);
+      
+      // Cambiar mensaje cada cierto tiempo
+      const messages = [
+        "💛 Este ramo es para ti 🌻",
+        "🌼 Flores amarillas como el sol 🌞",
+        "💐 Siempre floreces donde estás 🌺",
+        "🌻 Tu sonrisa ilumina como estas flores 💛",
+        "🌼 Un jardín de alegrías para ti 🌸"
+      ];
+      
+      let msgIndex = 0;
+      setInterval(() => {
+        msgIndex = (msgIndex + 1) % messages.length;
+        document.getElementById('msg').innerHTML = messages[msgIndex];
+      }, 4000);
     </script>
 
-    <!-- Escena AR -->
-    <a-scene embedded arjs>
+    <!-- Escena AR con componentes personalizados -->
+    <script>
+      // Componente para movimiento suave tipo brisa
+      AFRAME.registerComponent('sway', {
+        schema: {
+          speed: {default: 1},
+          amplitude: {default: 5}
+        },
+        tick: function (time) {
+          const el = this.el;
+          const speed = this.data.speed;
+          const amplitude = this.data.amplitude;
+          el.object3D.rotation.z = Math.sin(time * 0.001 * speed) * amplitude * Math.PI / 180;
+          el.object3D.rotation.x = Math.sin(time * 0.001 * speed * 0.7) * amplitude * 0.5 * Math.PI / 180;
+        }
+      });
+      
+      // Componente para flotar suavemente
+      AFRAME.registerComponent('float', {
+        schema: {
+          speed: {default: 1},
+          amplitude: {default: 0.1}
+        },
+        tick: function (time) {
+          const el = this.el;
+          const speed = this.data.speed;
+          const amplitude = this.data.amplitude;
+          el.object3D.position.y = Math.sin(time * 0.001 * speed) * amplitude;
+        }
+      });
+    </script>
+
+    <!-- Escena AR mejorada -->
+    <a-scene 
+      embedded 
+      arjs="debugUIEnabled: false; sourceType: webcam;"
+      vr-mode-ui="enabled: false"
+      renderer="logarithmicDepthBuffer: true; colorManagement: true;">
+      
+      <a-assets>
+        <!-- Precargar assets para mejor rendimiento -->
+      </a-assets>
+      
       <a-marker preset="hiro">
-        <!-- Girasol izquierdo con balanceo -->
-        <a-entity
-          gltf-model="https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Sunflower/glTF/Sunflower.gltf"
-          scale="0.4 0.4 0.4"
-          position="-0.3 0 0"
-          animation="property=rotation; to=0 200 0; dir=alternate; loop=true; dur=3000">
+        <!-- Grupo principal del ramo -->
+        <a-entity id="bouquet" position="0 0.5 0">
+          
+          <!-- Girasol central grande -->
+          <a-entity
+            geometry="primitive: cylinder; radius: 0.02; height: 0.8"
+            material="color: #228B22"
+            position="0 -0.4 0">
+          </a-entity>
+          <a-entity
+            geometry="primitive: sphere; radius: 0.15"
+            material="color: #8B4513"
+            position="0 0 0">
+          </a-entity>
+          <a-entity position="0 0 0">
+            <!-- Pétalos del girasol central -->
+            <a-entity
+              geometry="primitive: plane; width: 0.1; height: 0.3"
+              material="color: #FFD700; side: double"
+              position="0.2 0 0"
+              rotation="0 0 -30"
+              sway="speed: 1.2; amplitude: 3">
+            </a-entity>
+            <a-entity
+              geometry="primitive: plane; width: 0.1; height: 0.3"
+              material="color: #FFD700; side: double"
+              position="-0.2 0 0"
+              rotation="0 0 30"
+              sway="speed: 1.2; amplitude: 3">
+            </a-entity>
+            <a-entity
+              geometry="primitive: plane; width: 0.1; height: 0.3"
+              material="color: #FFEA00; side: double"
+              position="0 0.2 0"
+              rotation="0 0 0"
+              sway="speed: 1; amplitude: 4">
+            </a-entity>
+            <a-entity
+              geometry="primitive: plane; width: 0.1; height: 0.3"
+              material="color: #FFEA00; side: double"
+              position="0 -0.2 0"
+              rotation="0 0 180"
+              sway="speed: 1; amplitude: 4">
+            </a-entity>
+            <!-- Más pétalos -->
+            <a-entity
+              geometry="primitive: plane; width: 0.1; height: 0.3"
+              material="color: #FFD700; side: double"
+              position="0.14 0.14 0"
+              rotation="0 0 -45"
+              sway="speed: 1.3; amplitude: 3">
+            </a-entity>
+            <a-entity
+              geometry="primitive: plane; width: 0.1; height: 0.3"
+              material="color: #FFD700; side: double"
+              position="-0.14 0.14 0"
+              rotation="0 0 45"
+              sway="speed: 1.3; amplitude: 3">
+            </a-entity>
+            <a-entity
+              geometry="primitive: plane; width: 0.1; height: 0.3"
+              material="color: #FFEA00; side: double"
+              position="0.14 -0.14 0"
+              rotation="0 0 -135"
+              sway="speed: 1.1; amplitude: 4">
+            </a-entity>
+            <a-entity
+              geometry="primitive: plane; width: 0.1; height: 0.3"
+              material="color: #FFEA00; side: double"
+              position="-0.14 -0.14 0"
+              rotation="0 0 135"
+              sway="speed: 1.1; amplitude: 4">
+            </a-entity>
+          </a-entity>
+          
+          <!-- Girasol izquierdo -->
+          <a-entity position="-0.4 -0.1 0.1" rotation="0 0 -15">
+            <a-entity
+              geometry="primitive: cylinder; radius: 0.015; height: 0.6"
+              material="color: #228B22"
+              position="0 -0.3 0">
+            </a-entity>
+            <a-entity
+              geometry="primitive: sphere; radius: 0.1"
+              material="color: #8B4513"
+              position="0 0 0"
+              float="speed: 1.5; amplitude: 0.05">
+            </a-entity>
+            <!-- Pétalos -->
+            <a-entity position="0 0 0">
+              <a-entity
+                geometry="primitive: plane; width: 0.08; height: 0.2"
+                material="color: #FFD700; side: double"
+                position="0.12 0 0"
+                sway="speed: 1.4; amplitude: 5">
+              </a-entity>
+              <a-entity
+                geometry="primitive: plane; width: 0.08; height: 0.2"
+                material="color: #FFD700; side: double"
+                position="-0.12 0 0"
+                sway="speed: 1.4; amplitude: 5">
+              </a-entity>
+              <a-entity
+                geometry="primitive: plane; width: 0.08; height: 0.2"
+                material="color: #FFEA00; side: double"
+                position="0 0.12 0"
+                sway="speed: 1.2; amplitude: 6">
+              </a-entity>
+              <a-entity
+                geometry="primitive: plane; width: 0.08; height: 0.2"
+                material="color: #FFEA00; side: double"
+                position="0 -0.12 0"
+                sway="speed: 1.2; amplitude: 6">
+              </a-entity>
+            </a-entity>
+          </a-entity>
+          
+          <!-- Girasol derecho -->
+          <a-entity position="0.4 -0.1 0.1" rotation="0 0 15">
+            <a-entity
+              geometry="primitive: cylinder; radius: 0.015; height: 0.6"
+              material="color: #228B22"
+              position="0 -0.3 0">
+            </a-entity>
+            <a-entity
+              geometry="primitive: sphere; radius: 0.1"
+              material="color: #8B4513"
+              position="0 0 0"
+              float="speed: 1.3; amplitude: 0.05">
+            </a-entity>
+            <!-- Pétalos -->
+            <a-entity position="0 0 0">
+              <a-entity
+                geometry="primitive: plane; width: 0.08; height: 0.2"
+                material="color: #FFD700; side: double"
+                position="0.12 0 0"
+                sway="speed: 1.6; amplitude: 5">
+              </a-entity>
+              <a-entity
+                geometry="primitive: plane; width: 0.08; height: 0.2"
+                material="color: #FFD700; side: double"
+                position="-0.12 0 0"
+                sway="speed: 1.6; amplitude: 5">
+              </a-entity>
+              <a-entity
+                geometry="primitive: plane; width: 0.08; height: 0.2"
+                material="color: #FFEA00; side: double"
+                position="0 0.12 0"
+                sway="speed: 1.3; amplitude: 6">
+              </a-entity>
+              <a-entity
+                geometry="primitive: plane; width: 0.08; height: 0.2"
+                material="color: #FFEA00; side: double"
+                position="0 -0.12 0"
+                sway="speed: 1.3; amplitude: 6">
+              </a-entity>
+            </a-entity>
+          </a-entity>
+          
+          <!-- Flores pequeñas adicionales -->
+          <a-entity position="-0.2 -0.2 -0.1" rotation="0 0 -10">
+            <a-entity
+              geometry="primitive: cylinder; radius: 0.01; height: 0.4"
+              material="color: #228B22"
+              position="0 -0.2 0">
+            </a-entity>
+            <a-entity
+              geometry="primitive: sphere; radius: 0.06"
+              material="color: #FFA500"
+              position="0 0 0"
+              float="speed: 2; amplitude: 0.03">
+            </a-entity>
+          </a-entity>
+          
+          <a-entity position="0.2 -0.2 -0.1" rotation="0 0 10">
+            <a-entity
+              geometry="primitive: cylinder; radius: 0.01; height: 0.4"
+              material="color: #228B22"
+              position="0 -0.2 0">
+            </a-entity>
+            <a-entity
+              geometry="primitive: sphere; radius: 0.06"
+              material="color: #FFA500"
+              position="0 0 0"
+              float="speed: 1.8; amplitude: 0.03">
+            </a-entity>
+          </a-entity>
+          
+          <!-- Hojas decorativas -->
+          <a-entity
+            geometry="primitive: plane; width: 0.08; height: 0.15"
+            material="color: #228B22; side: double"
+            position="-0.25 -0.4 0"
+            rotation="0 0 -45"
+            sway="speed: 0.8; amplitude: 2">
+          </a-entity>
+          <a-entity
+            geometry="primitive: plane; width: 0.08; height: 0.15"
+            material="color: #228B22; side: double"
+            position="0.25 -0.4 0"
+            rotation="0 0 45"
+            sway="speed: 0.8; amplitude: 2">
+          </a-entity>
+          
+          <!-- Animación de rotación suave del ramo completo -->
+          <a-animation
+            attribute="rotation"
+            to="0 360 0"
+            dur="20000"
+            repeat="indefinite"
+            easing="linear">
+          </a-animation>
         </a-entity>
-
-        <!-- Girasol central con movimiento suave -->
+        
+        <!-- Texto 3D flotante -->
+        <a-text
+          value="Para Ti"
+          color="#FFD700"
+          position="0 1.2 0"
+          align="center"
+          width="3"
+          font="kelsonsans"
+          animation="property: position; to: 0 1.4 0; dir: alternate; dur: 2000; loop: true; easing: easeInOutSine">
+        </a-text>
+        
+        <!-- Partículas de luz -->
         <a-entity
-          gltf-model="https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Sunflower/glTF/Sunflower.gltf"
-          scale="0.5 0.5 0.5"
-          position="0 0 0"
-          animation="property=rotation; to=0 160 0; dir=alternate; loop=true; dur=3500">
+          geometry="primitive: sphere; radius: 0.02"
+          material="color: #FFFACD; emissive: #FFFACD; emissiveIntensity: 0.5"
+          position="0.3 0.8 0.2"
+          animation="property: position; to: -0.3 0.2 -0.2; dir: alternate; dur: 3000; loop: true">
         </a-entity>
-
-        <!-- Girasol derecho con balanceo -->
         <a-entity
-          gltf-model="https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Sunflower/glTF/Sunflower.gltf"
-          scale="0.4 0.4 0.4"
-          position="0.3 0 0"
-          animation="property=rotation; to=0 200 0; dir=alternate; loop=true; dur=2800">
+          geometry="primitive: sphere; radius: 0.02"
+          material="color: #FFFACD; emissive: #FFFACD; emissiveIntensity: 0.5"
+          position="-0.3 0.6 -0.2"
+          animation="property: position; to: 0.3 0.9 0.2; dir: alternate; dur: 3500; loop: true">
         </a-entity>
       </a-marker>
 
